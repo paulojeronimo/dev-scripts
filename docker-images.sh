@@ -1,37 +1,32 @@
 #!/usr/bin/env bash
-#
-# This script is used to save and restore docker images
-# to skipping the download of some images.
-#
-# Author: Paulo Jeronimo <paulojeronimo@gmail.com>
-#
 set -euo pipefail
-cd $(dirname $0)/..
-
-DOCKER_IMAGES_DIR=${DOCKER_IMAGES_DIR:-.docker-images}
-
+cd $(dirname $0)/../..
+base_dir=$PWD
+docker_images_dir=${docker_images_dir:-.private/docker-images}
+echo Base dir: $base_dir
+echo Docker images dir: $docker_images_dir
 case "${1:-}" in
 save)
-  mkdir -p "$DOCKER_IMAGES_DIR"
+  mkdir -p "$docker_images_dir"
   docker images --format "{{.Repository}} {{.Tag}}" | while read -r repo tag; do
     [ -z "$repo" ] || [ -z "$tag" ] && continue
 
     filename="${repo//\//_}_${tag//:/_}.tar"
-    filepath="$DOCKER_IMAGES_DIR/$filename"
+    filepath="$docker_images_dir/$filename"
 
-    echo "Saving docker image $repo:$tag to $filepath"
+    echo "Saving docker image $repo:$tag to ${filepath#$docker_images_dir/}"
     docker save -o "$filepath" "$repo:$tag"
   done
   ;;
 restore)
-  if [ ! -d "$DOCKER_IMAGES_DIR" ]; then
-    echo "Error: Docker images directory '$DOCKER_IMAGES_DIR' not found"
+  if [ ! -d "$docker_images_dir" ]; then
+    echo "Error: Docker images directory '$docker_images_dir' not found"
     exit 1
   fi
 
-  for filepath in "$DOCKER_IMAGES_DIR"/*.tar; do
+  for filepath in "$docker_images_dir"/*.tar; do
     [ -f "$filepath" ] || continue
-    echo "Loading docker image from $filepath"
+    echo "Loading docker image from ${filepath#$docker_images_dir/}"
     docker load -i "$filepath"
   done
   ;;
