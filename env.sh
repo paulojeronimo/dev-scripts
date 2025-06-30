@@ -2,7 +2,7 @@
 set -eou pipefail
 cd $(dirname $0)/../..
 base_dir=$PWD
-env_dir=${env_dir:-.private/files}
+env_dir=${env_dir:-.private/env}
 echo Base dir: $base_dir
 echo Env dir: $env_dir
 case "${1:-}" in
