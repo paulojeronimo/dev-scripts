@@ -20,8 +20,8 @@ save)
   ;;
 restore)
   if [ ! -d "$docker_images_dir" ]; then
-    echo "Error: Docker images directory '$docker_images_dir' not found"
-    exit 1
+    echo "WARNING: Docker images directory '$docker_images_dir' not found. Nothihng to do."
+    exit 0
   fi
 
   for filepath in "$docker_images_dir"/*.tar; do
